@@ -28,6 +28,7 @@ export default function TabsLayout() {
         sceneStyle: { backgroundColor: colors.bg },
       }}>
       {tab('index', 'Home', 'home-outline')}
+      {tab('add', 'Add', 'add-circle-outline')}
     </Tabs>
   );
 }
