@@ -31,6 +31,7 @@ export default function TabsLayout() {
       {tab('history', 'History', 'list-outline')}
       {tab('add', 'Add', 'add-circle-outline')}
       {tab('insights', 'Insights', 'pie-chart-outline')}
+      {tab('wishlist', 'Wishlist', 'gift-outline')}
     </Tabs>
   );
 }
