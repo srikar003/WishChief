@@ -30,6 +30,7 @@ export default function TabsLayout() {
       {tab('index', 'Home', 'home-outline')}
       {tab('history', 'History', 'list-outline')}
       {tab('add', 'Add', 'add-circle-outline')}
+      {tab('insights', 'Insights', 'pie-chart-outline')}
     </Tabs>
   );
 }
