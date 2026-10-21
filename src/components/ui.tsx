@@ -162,11 +162,11 @@ export function Button({
   label: string;
   onPress: () => void;
   icon?: keyof typeof Ionicons.glyphMap;
-  variant?: 'primary' | 'outline' | 'ghost';
+  variant?: 'primary' | 'outline' | 'ghost' | 'danger';
   loading?: boolean;
 }) {
   const primary = variant === 'primary';
-  const fg = primary ? colors.onGold : colors.text;
+  const fg = primary ? colors.onGold : variant === 'danger' ? colors.danger : colors.text;
   return (
     <Pressable
       onPress={loading ? undefined : onPress}
@@ -174,6 +174,7 @@ export function Button({
         styles.button,
         primary && { backgroundColor: colors.gold, borderColor: colors.gold },
         variant === 'ghost' && { borderColor: 'transparent' },
+        variant === 'danger' && { borderColor: colors.danger },
         pressed && { opacity: 0.8 },
       ]}>
       {loading ? (
