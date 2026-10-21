@@ -123,6 +123,9 @@ function SettingsBody({ goal: current }: { goal: GoalData | null }) {
         <Txt weight="medium">Account</Txt>
         <Muted style={{ marginTop: 2, marginBottom: space.md }}>{session?.user.email}</Muted>
         <Button label="Sign out" variant="outline" onPress={signOut} />
+        <View style={{ marginTop: space.sm }}>
+          <Button label="Privacy policy" variant="ghost" onPress={() => router.push('/privacy')} />
+        </View>
       </Card>
 
       <Card style={{ marginTop: space.md }}>
