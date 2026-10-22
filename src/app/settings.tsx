@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
@@ -7,6 +7,7 @@ import { Pressable, View } from 'react-native';
 import { Button, Card, Chip, ErrorText, Field, Loading, Muted, Screen, Txt } from '@/components/ui';
 import { api } from '@/lib/api';
 import { authClient } from '@/lib/auth-client';
+import { confirm } from '@/lib/confirm';
 import { CURRENCIES } from '@/lib/format';
 import { useApiMutation, useAppData } from '@/lib/queries';
 import type { GoalData } from '@/lib/api';
@@ -49,6 +50,39 @@ function SettingsBody({ goal: current }: { goal: GoalData | null }) {
     qc.clear();
   }
 
+  // Email sign-ups confirm with their password; Google sign-ins have none and use their fresh session.
+  const accounts = useQuery({
+    queryKey: ['accounts'],
+    queryFn: async () => (await authClient.listAccounts()).data ?? [],
+  });
+  const hasPassword = !!accounts.data?.some((a) => a.providerId === 'credential');
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  async function deleteAccount() {
+    setDeleteError(null);
+    if (hasPassword && !deletePassword) return setDeleteError('Enter your password to confirm');
+    setDeleting(true);
+    try {
+      const { error } = await authClient.deleteUser(hasPassword ? { password: deletePassword } : {});
+      if (error) {
+        setDeleteError(
+          hasPassword
+            ? (error.message ?? "Couldn't delete your account")
+            : 'For security, sign out, sign in again, then retry within a day.',
+        );
+        return;
+      }
+      await authClient.signOut().catch(() => {});
+      qc.clear();
+    } catch (e) {
+      setDeleteError(e instanceof Error ? e.message : "Couldn't delete your account");
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   return (
     <Screen
       title="Settings"
@@ -89,6 +123,37 @@ function SettingsBody({ goal: current }: { goal: GoalData | null }) {
         <Txt weight="medium">Account</Txt>
         <Muted style={{ marginTop: 2, marginBottom: space.md }}>{session?.user.email}</Muted>
         <Button label="Sign out" variant="outline" onPress={signOut} />
+        <View style={{ marginTop: space.sm }}>
+          <Button label="Privacy policy" variant="ghost" onPress={() => router.push('/privacy')} />
+        </View>
+      </Card>
+
+      <Card style={{ marginTop: space.md }}>
+        <Txt weight="medium">Delete account</Txt>
+        <Muted style={{ marginTop: 2 }}>
+          Permanently deletes your account, savings and wishes. This can&apos;t be undone.
+        </Muted>
+        {hasPassword ? (
+          <Field
+            label="Password"
+            value={deletePassword}
+            onChangeText={setDeletePassword}
+            placeholder="Confirm with your password"
+            secureTextEntry
+            autoCapitalize="none"
+          />
+        ) : null}
+        <ErrorText>{deleteError}</ErrorText>
+        <View style={{ marginTop: space.md }}>
+          <Button
+            label="Delete account"
+            variant="danger"
+            loading={deleting}
+            onPress={() =>
+              confirm('Delete your account?', 'Your savings and wishes will be gone for good.', 'Delete', deleteAccount)
+            }
+          />
+        </View>
       </Card>
     </Screen>
   );

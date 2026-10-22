@@ -17,6 +17,9 @@ function create() {
     secret: process.env.BETTER_AUTH_SECRET,
     baseURL: process.env.BETTER_AUTH_URL ?? process.env.EXPO_PUBLIC_API_URL,
     emailAndPassword: { enabled: true, minPasswordLength: 8 },
+    // Required by Google Play: users can delete their account and data from the app.
+    // Rows in goal/category/entry/wish cascade from the user row.
+    user: { deleteUser: { enabled: true } },
     socialProviders:
       googleId && googleSecret
         ? { google: { clientId: googleId, clientSecret: googleSecret } }

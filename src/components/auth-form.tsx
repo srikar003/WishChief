@@ -114,6 +114,13 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
           </Txt>
         </Link>
       </View>
+      <View style={{ alignItems: 'center', marginTop: space.lg }}>
+        <Link href="/privacy">
+          <Txt size={12} color={colors.muted}>
+            Privacy policy
+          </Txt>
+        </Link>
+      </View>
     </Screen>
   );
 }
